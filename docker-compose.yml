@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  # PHP + Apache
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: php-app
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}                    # → appdb
+      POSTGRES_USER: ${POSTGRES_USER}                # → postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}        # → 12345
+
+      DB_DRIVER: ${DB_DRIVER}                        # → pgsql
+      DB_HOST: ${DB_HOST}                            # → localhost
+      DB_PORT: ${DB_PORT}                            # → 5432
+      DB_NAME: ${DB_NAME}                            # → appdb
+      DB_USER: ${DB_USER}                            # → postgres
+      DB_PASSWORD: ${DB_PASSWORD}                    # → 12345
+      APP_ENV: development
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app_network
+    restart: unless-stopped
+
+  # Database (PostgreSQL O MySQL)
+  # Per usare PostgreSQL: DB_DRIVER=pgsql in .env
+  # Per usare MySQL: DB_DRIVER=mysql in .env
+  db:
+    # Scelta A: PostgreSQL (default)
+    image: postgres:16-alpine
+    # Scelta B: MySQL (attiva se preferisci)
+    # image: mysql:8.0-alpine
+    
+    container_name: app-db
+    environment:
+      # PostgreSQL
+      POSTGRES_DB: appdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345
+      # MySQL (ignora se usi PostgreSQL)
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: appdb
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: appuser
+    ports:
+      - "5432:5432"  # PostgreSQL
+      # - "3306:3306"  # MySQL (decommentare se usi MySQL)
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      # Per MySQL: - db_data:/var/lib/mysql
+      - ./migrations:/docker-entrypoint-initdb.d
+    networks:
+      - app_network
+    restart: unless-stopped
+    healthcheck:
+      # Per PostgreSQL
+      test: ["CMD-SHELL", "pg_isready -U appuser"]
+      # Per MySQL: test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  db_data:
+
+networks:
+  app_network:
+    driver: bridge
