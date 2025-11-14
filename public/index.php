@@ -32,75 +32,18 @@ $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 // Endpoint 1: GET / → Homepage
 if ($path === '/') {
-    header('Content-Type: text/html; charset=utf-8');
-    ?>
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Docker PHP <?php echo $db_driver; ?></title>
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial; margin: 0; padding: 20px; background: #f5f5f5; }
-        .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        h1 { color: #333; margin: 0 0 10px; }
-        .subtitle { color: #666; margin-bottom: 30px; }
-        .status { padding: 15px; margin: 20px 0; border-radius: 5px; font-weight: bold; }
-        .ok { background: #d4edda; color: #155724; }
-        .error { background: #f8d7da; color: #721c24; }
-        .section { margin: 30px 0; }
-        h3 { color: #333; margin: 20px 0 10px; }
-        code { background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: 'Courier New'; }
-        pre { background: #f0f0f0; padding: 10px; border-radius: 5px; overflow-x: auto; }
-        a { color: #0066cc; text-decoration: none; }
-        a:hover { text-decoration: underline; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Docker PHP + <?php echo strtoupper($db_driver); ?></h1>
-        <p class="subtitle">Struttura minimale per imparare Docker</p>
-
-        <div class="status ok">
-            <?php echo $db_status; ?>
-        </div>
-
-        <div class="section">
-            <h3>Endpoint API</h3>
-            <code>GET /api/health</code> - Status sistema<br><br>
-            <code>GET /api/users</code> - Lista utenti<br><br>
-            <code>POST /api/users</code> - Crea utente
-        </div>
-
-        <div class="section">
-            <h3>Comandi Rapidi</h3>
-            <pre>
-                make up              # Avvia
-                make down            # Ferma
-                make bash            # Terminal container
-                make db              # Terminal database
-                make logs            # Visualizza log
-            </pre>
-        </div>
-
-        <div class="section">
-            <h3>Struttura Progetto</h3>
-            <pre>mio_progetto/
-                            ├── docker/
-                            │   ├── Dockerfile
-                            │   └── php.ini
-                            ├── migrations/
-                            │   └── init.sql
-                            ├── public/
-                            │   └── index.php
-                            ├── docker-compose.yml
-                            ├── .env
-                            ├── .gitignore
-                            └── Makefile</pre>
-        </div>
-    </div>
-</body>
-</html>
-    <?php
+    header('Content-Type: application/json');
+    echo json_encode([
+        'status' => 'ok',
+        'message' => 'API REST Backend',
+        'version' => '1.0',
+        'endpoints' => [
+            'GET /api/health' => 'Health check',
+            'GET /api/users' => 'List users',
+            'POST /api/users' => 'Create user',
+            'GET /api/posts' => 'List posts'
+        ]
+    ]);
 }
 
 // Endpoint 2: GET /api/health → Status sistema

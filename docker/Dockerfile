@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install pdo pdo_pgsql pdo_mysql \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Copia php.ini minimale
+# Copia php.ini
 COPY docker/php.ini /usr/local/etc/php/conf.d/app.ini
 
 # DocumentRoot
