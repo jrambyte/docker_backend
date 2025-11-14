@@ -1,6 +1,7 @@
 # 🐳 Docker PHP Minimale
 
 Progetto didattico per imparare Docker, PHP e database (PostgreSQL/MySQL).
+Tutte le guide sono in /docs.
 
 ## Struttura
 

@@ -12,12 +12,9 @@ services:
     volumes:
       - .:/var/www/html
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}                    # → appdb
-      POSTGRES_USER: ${POSTGRES_USER}                # → postgres
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}        # → 12345
-
+      # Variabili dal .env (non hardcoded)
       DB_DRIVER: ${DB_DRIVER}                        # → pgsql
-      DB_HOST: ${DB_HOST}                            # → localhost
+      DB_HOST: ${DB_HOST}                            # → db
       DB_PORT: ${DB_PORT}                            # → 5432
       DB_NAME: ${DB_NAME}                            # → appdb
       DB_USER: ${DB_USER}                            # → postgres
@@ -41,15 +38,15 @@ services:
     
     container_name: app-db
     environment:
-      # PostgreSQL
-      POSTGRES_DB: appdb
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 12345
+      # PostgreSQL - Variabili dal .env (non hardcoded)
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       # MySQL (ignora se usi PostgreSQL)
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: appdb
-      MYSQL_USER: appuser
-      MYSQL_PASSWORD: appuser
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
       - "5432:5432"  # PostgreSQL
       # - "3306:3306"  # MySQL (decommentare se usi MySQL)
@@ -62,7 +59,7 @@ services:
     restart: unless-stopped
     healthcheck:
       # Per PostgreSQL
-      test: ["CMD-SHELL", "pg_isready -U appuser"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       # Per MySQL: test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
       timeout: 5s
